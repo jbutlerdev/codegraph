@@ -1,0 +1,9 @@
+{
+  "name": "@jbutler/codegraph",
+  "version": "0.1.0",
+  "description": "CodeGraph tools for pi agent",
+  "pi": {
+    "extensions": ["./index.ts"]
+  },
+  "dependencies": {}
+}

@@ -1,0 +1,86 @@
+[2m2026-05-11T17:58:27.396709Z[0m [32m INFO[0m [2mcodegraph[0m[2m:[0m CodeGraph starting...
+[2m2026-05-11T17:58:27.397909Z[0m [32m INFO[0m [2mcodegraph::ingest::local[0m[2m:[0m Creating new repo 4fc5b8b8-9fb4-4fe4-9166-3aae4ec9e05a for path .
+[2m2026-05-11T17:58:27.404012Z[0m [32m INFO[0m [2mcodegraph::ingest::local[0m[2m:[0m Scanning files...
+[2m2026-05-11T17:58:27.405572Z[0m [32m INFO[0m [2mcodegraph::ingest::scanner[0m[2m:[0m Scanned 40 files from "."
+[2m2026-05-11T17:58:27.405607Z[0m [32m INFO[0m [2mcodegraph::ingest::local[0m[2m:[0m Found 0 existing file hashes in database
+[2m2026-05-11T17:58:27.441855Z[0m [32m INFO[0m [2mcodegraph::ingest::analyzer[0m[2m:[0m Analyzing file ingest.log (92 tokens)
+[2m2026-05-11T17:58:27.441876Z[0m [32m INFO[0m [2mcodegraph::llm::client[0m[2m:[0m Sending request to LLM endpoint: http://bitfrost.botnet:8080/v1 with model: llamacpp/qwen3.6-27b
+[2m2026-05-11T17:59:37.759098Z[0m [32m INFO[0m [2mcodegraph::ingest::analyzer[0m[2m:[0m Analyzing file demo.sh (1115 tokens)
+[2m2026-05-11T17:59:37.759120Z[0m [32m INFO[0m [2mcodegraph::llm::client[0m[2m:[0m Sending request to LLM endpoint: http://bitfrost.botnet:8080/v1 with model: llamacpp/qwen3.6-27b
+[2m2026-05-11T18:00:45.805118Z[0m [32m INFO[0m [2mcodegraph::ingest::analyzer[0m[2m:[0m Analyzing file quick_demo.sh (367 tokens)
+[2m2026-05-11T18:00:45.805141Z[0m [32m INFO[0m [2mcodegraph::llm::client[0m[2m:[0m Sending request to LLM endpoint: http://bitfrost.botnet:8080/v1 with model: llamacpp/qwen3.6-27b
+[2m2026-05-11T18:02:24.182716Z[0m [32m INFO[0m [2mcodegraph::ingest::analyzer[0m[2m:[0m Analyzing file README.md (973 tokens)
+[2m2026-05-11T18:02:24.182736Z[0m [32m INFO[0m [2mcodegraph::llm::client[0m[2m:[0m Sending request to LLM endpoint: http://bitfrost.botnet:8080/v1 with model: llamacpp/qwen3.6-27b
+[2m2026-05-11T18:04:05.166598Z[0m [32m INFO[0m [2mcodegraph::ingest::analyzer[0m[2m:[0m Analyzing file Cargo.toml (374 tokens)
+[2m2026-05-11T18:04:05.166624Z[0m [32m INFO[0m [2mcodegraph::llm::client[0m[2m:[0m Sending request to LLM endpoint: http://bitfrost.botnet:8080/v1 with model: llamacpp/qwen3.6-27b
+[2m2026-05-11T18:05:51.369328Z[0m [32m INFO[0m [2mcodegraph::ingest::analyzer[0m[2m:[0m Analyzing file tests/db_tests.rs (1708 tokens)
+[2m2026-05-11T18:05:51.369354Z[0m [32m INFO[0m [2mcodegraph::llm::client[0m[2m:[0m Sending request to LLM endpoint: http://bitfrost.botnet:8080/v1 with model: llamacpp/qwen3.6-27b
+[2m2026-05-11T18:08:25.424025Z[0m [32m INFO[0m [2mcodegraph::ingest::analyzer[0m[2m:[0m Analyzing file tests/ingest_tests.rs (3849 tokens)
+[2m2026-05-11T18:08:25.424162Z[0m [32m INFO[0m [2mcodegraph::llm::client[0m[2m:[0m Sending request to LLM endpoint: http://bitfrost.botnet:8080/v1 with model: llamacpp/qwen3.6-27b
+[2m2026-05-11T18:10:42.775130Z[0m [32m INFO[0m [2mcodegraph::ingest::analyzer[0m[2m:[0m Analyzing file tests/entity_tests.rs (1527 tokens)
+[2m2026-05-11T18:10:42.775284Z[0m [32m INFO[0m [2mcodegraph::llm::client[0m[2m:[0m Sending request to LLM endpoint: http://bitfrost.botnet:8080/v1 with model: llamacpp/qwen3.6-27b
+[2m2026-05-11T18:13:20.381290Z[0m [32m INFO[0m [2mcodegraph::ingest::analyzer[0m[2m:[0m Analyzing file tests/search_tests.rs (1777 tokens)
+[2m2026-05-11T18:13:20.381603Z[0m [32m INFO[0m [2mcodegraph::llm::client[0m[2m:[0m Sending request to LLM endpoint: http://bitfrost.botnet:8080/v1 with model: llamacpp/qwen3.6-27b
+[2m2026-05-11T18:16:02.479438Z[0m [32m INFO[0m [2mcodegraph::ingest::analyzer[0m[2m:[0m Analyzing file tests/integration_tests.rs (383 tokens)
+[2m2026-05-11T18:16:02.479466Z[0m [32m INFO[0m [2mcodegraph::llm::client[0m[2m:[0m Sending request to LLM endpoint: http://bitfrost.botnet:8080/v1 with model: llamacpp/qwen3.6-27b
+[2m2026-05-11T18:18:00.686100Z[0m [32m INFO[0m [2mcodegraph::ingest::analyzer[0m[2m:[0m Analyzing file src/main.rs (550 tokens)
+[2m2026-05-11T18:18:00.686123Z[0m [32m INFO[0m [2mcodegraph::llm::client[0m[2m:[0m Sending request to LLM endpoint: http://bitfrost.botnet:8080/v1 with model: llamacpp/qwen3.6-27b
+[2m2026-05-11T18:20:15.616743Z[0m [32m INFO[0m [2mcodegraph::ingest::analyzer[0m[2m:[0m Analyzing file src/lib.rs (52 tokens)
+[2m2026-05-11T18:20:15.616855Z[0m [32m INFO[0m [2mcodegraph::llm::client[0m[2m:[0m Sending request to LLM endpoint: http://bitfrost.botnet:8080/v1 with model: llamacpp/qwen3.6-27b
+[2m2026-05-11T18:21:28.682415Z[0m [32m INFO[0m [2mcodegraph::ingest::analyzer[0m[2m:[0m Analyzing file src/error.rs (201 tokens)
+[2m2026-05-11T18:21:28.682437Z[0m [32m INFO[0m [2mcodegraph::llm::client[0m[2m:[0m Sending request to LLM endpoint: http://bitfrost.botnet:8080/v1 with model: llamacpp/qwen3.6-27b
+[2m2026-05-11T18:23:34.656519Z[0m [32m INFO[0m [2mcodegraph::ingest::analyzer[0m[2m:[0m Analyzing file src/ingest/big_file.rs (1720 tokens)
+[2m2026-05-11T18:23:34.656792Z[0m [32m INFO[0m [2mcodegraph::llm::client[0m[2m:[0m Sending request to LLM endpoint: http://bitfrost.botnet:8080/v1 with model: llamacpp/qwen3.6-27b
+[2m2026-05-11T18:25:36.978415Z[0m [32m INFO[0m [2mcodegraph::ingest::analyzer[0m[2m:[0m Analyzing file src/ingest/local.rs (1808 tokens)
+[2m2026-05-11T18:25:36.978492Z[0m [32m INFO[0m [2mcodegraph::llm::client[0m[2m:[0m Sending request to LLM endpoint: http://bitfrost.botnet:8080/v1 with model: llamacpp/qwen3.6-27b
+[2m2026-05-11T18:27:38.339290Z[0m [32m INFO[0m [2mcodegraph::ingest::analyzer[0m[2m:[0m Analyzing file src/ingest/analyzer.rs (2072 tokens)
+[2m2026-05-11T18:27:38.339316Z[0m [32m INFO[0m [2mcodegraph::llm::client[0m[2m:[0m Sending request to LLM endpoint: http://bitfrost.botnet:8080/v1 with model: llamacpp/qwen3.6-27b
+[2m2026-05-11T18:30:34.692198Z[0m [32m INFO[0m [2mcodegraph::ingest::analyzer[0m[2m:[0m Analyzing file src/ingest/scanner.rs (1197 tokens)
+[2m2026-05-11T18:30:34.692479Z[0m [32m INFO[0m [2mcodegraph::llm::client[0m[2m:[0m Sending request to LLM endpoint: http://bitfrost.botnet:8080/v1 with model: llamacpp/qwen3.6-27b
+[2m2026-05-11T18:32:37.299777Z[0m [32m INFO[0m [2mcodegraph::ingest::analyzer[0m[2m:[0m Analyzing file src/ingest/mod.rs (61 tokens)
+[2m2026-05-11T18:32:37.299797Z[0m [32m INFO[0m [2mcodegraph::llm::client[0m[2m:[0m Sending request to LLM endpoint: http://bitfrost.botnet:8080/v1 with model: llamacpp/qwen3.6-27b
+[2m2026-05-11T18:34:13.282792Z[0m [32m INFO[0m [2mcodegraph::ingest::analyzer[0m[2m:[0m Analyzing file src/ingest/github.rs (1565 tokens)
+[2m2026-05-11T18:34:13.282815Z[0m [32m INFO[0m [2mcodegraph::llm::client[0m[2m:[0m Sending request to LLM endpoint: http://bitfrost.botnet:8080/v1 with model: llamacpp/qwen3.6-27b
+[2m2026-05-11T18:37:34.697112Z[0m [32m INFO[0m [2mcodegraph::ingest::analyzer[0m[2m:[0m Analyzing file src/cli/commands.rs (881 tokens)
+[2m2026-05-11T18:37:34.697148Z[0m [32m INFO[0m [2mcodegraph::llm::client[0m[2m:[0m Sending request to LLM endpoint: http://bitfrost.botnet:8080/v1 with model: llamacpp/qwen3.6-27b
+[2m2026-05-11T18:39:59.621689Z[0m [32m INFO[0m [2mcodegraph::ingest::analyzer[0m[2m:[0m Analyzing file src/cli/commands_impl.rs (5466 tokens)
+[2m2026-05-11T18:39:59.621715Z[0m [32m INFO[0m [2mcodegraph::llm::client[0m[2m:[0m Sending request to LLM endpoint: http://bitfrost.botnet:8080/v1 with model: llamacpp/qwen3.6-27b
+[2m2026-05-11T18:43:12.516882Z[0m [32m INFO[0m [2mcodegraph::ingest::analyzer[0m[2m:[0m Analyzing file src/cli/output.rs (736 tokens)
+[2m2026-05-11T18:43:12.517053Z[0m [32m INFO[0m [2mcodegraph::llm::client[0m[2m:[0m Sending request to LLM endpoint: http://bitfrost.botnet:8080/v1 with model: llamacpp/qwen3.6-27b
+[2m2026-05-11T18:46:08.001499Z[0m [32m INFO[0m [2mcodegraph::ingest::analyzer[0m[2m:[0m Analyzing file src/cli/mod.rs (38 tokens)
+[2m2026-05-11T18:46:08.001543Z[0m [32m INFO[0m [2mcodegraph::llm::client[0m[2m:[0m Sending request to LLM endpoint: http://bitfrost.botnet:8080/v1 with model: llamacpp/qwen3.6-27b
+[2m2026-05-11T18:47:07.864989Z[0m [32m INFO[0m [2mcodegraph::ingest::analyzer[0m[2m:[0m Analyzing file src/queue/mod.rs (33 tokens)
+[2m2026-05-11T18:47:07.865013Z[0m [32m INFO[0m [2mcodegraph::llm::client[0m[2m:[0m Sending request to LLM endpoint: http://bitfrost.botnet:8080/v1 with model: llamacpp/qwen3.6-27b
+[2m2026-05-11T18:49:12.817498Z[0m [32m INFO[0m [2mcodegraph::ingest::analyzer[0m[2m:[0m Analyzing file src/queue/manager.rs (1139 tokens)
+[2m2026-05-11T18:49:12.817525Z[0m [32m INFO[0m [2mcodegraph::llm::client[0m[2m:[0m Sending request to LLM endpoint: http://bitfrost.botnet:8080/v1 with model: llamacpp/qwen3.6-27b
+[2m2026-05-11T18:51:58.255182Z[0m [32m INFO[0m [2mcodegraph::ingest::analyzer[0m[2m:[0m Analyzing file src/queue/worker.rs (409 tokens)
+[2m2026-05-11T18:51:58.255205Z[0m [32m INFO[0m [2mcodegraph::llm::client[0m[2m:[0m Sending request to LLM endpoint: http://bitfrost.botnet:8080/v1 with model: llamacpp/qwen3.6-27b
+[2m2026-05-11T18:54:02.400728Z[0m [32m INFO[0m [2mcodegraph::ingest::analyzer[0m[2m:[0m Analyzing file src/queue/jobs.rs (916 tokens)
+[2m2026-05-11T18:54:02.400753Z[0m [32m INFO[0m [2mcodegraph::llm::client[0m[2m:[0m Sending request to LLM endpoint: http://bitfrost.botnet:8080/v1 with model: llamacpp/qwen3.6-27b
+[2m2026-05-11T18:57:31.241778Z[0m [32m INFO[0m [2mcodegraph::ingest::analyzer[0m[2m:[0m Analyzing file src/db/mod.rs (51 tokens)
+[2m2026-05-11T18:57:31.241816Z[0m [32m INFO[0m [2mcodegraph::llm::client[0m[2m:[0m Sending request to LLM endpoint: http://bitfrost.botnet:8080/v1 with model: llamacpp/qwen3.6-27b
+[2m2026-05-11T18:58:44.411679Z[0m [32m INFO[0m [2mcodegraph::ingest::analyzer[0m[2m:[0m Analyzing file src/db/knowledge.rs (2273 tokens)
+[2m2026-05-11T18:58:44.411702Z[0m [32m INFO[0m [2mcodegraph::llm::client[0m[2m:[0m Sending request to LLM endpoint: http://bitfrost.botnet:8080/v1 with model: llamacpp/qwen3.6-27b
+[2m2026-05-11T19:01:22.046600Z[0m [32m INFO[0m [2mcodegraph::ingest::analyzer[0m[2m:[0m Analyzing file src/db/search.rs (3740 tokens)
+[2m2026-05-11T19:01:22.046644Z[0m [32m INFO[0m [2mcodegraph::llm::client[0m[2m:[0m Sending request to LLM endpoint: http://bitfrost.botnet:8080/v1 with model: llamacpp/qwen3.6-27b
+[2m2026-05-11T19:04:26.931059Z[0m [32m INFO[0m [2mcodegraph::ingest::analyzer[0m[2m:[0m Analyzing file src/db/files.rs (1860 tokens)
+[2m2026-05-11T19:04:26.931153Z[0m [32m INFO[0m [2mcodegraph::llm::client[0m[2m:[0m Sending request to LLM endpoint: http://bitfrost.botnet:8080/v1 with model: llamacpp/qwen3.6-27b
+[2m2026-05-11T19:06:47.186067Z[0m [32m INFO[0m [2mcodegraph::ingest::analyzer[0m[2m:[0m Analyzing file src/db/entities.rs (2994 tokens)
+[2m2026-05-11T19:06:47.186090Z[0m [32m INFO[0m [2mcodegraph::llm::client[0m[2m:[0m Sending request to LLM endpoint: http://bitfrost.botnet:8080/v1 with model: llamacpp/qwen3.6-27b
+[2m2026-05-11T19:10:39.305458Z[0m [32m INFO[0m [2mcodegraph::ingest::analyzer[0m[2m:[0m Analyzing file src/db/conn.rs (2659 tokens)
+[2m2026-05-11T19:10:39.305569Z[0m [32m INFO[0m [2mcodegraph::llm::client[0m[2m:[0m Sending request to LLM endpoint: http://bitfrost.botnet:8080/v1 with model: llamacpp/qwen3.6-27b
+[2m2026-05-11T19:13:32.413593Z[0m [32m INFO[0m [2mcodegraph::ingest::analyzer[0m[2m:[0m Analyzing file src/llm/client.rs (930 tokens)
+[2m2026-05-11T19:13:32.413630Z[0m [32m INFO[0m [2mcodegraph::llm::client[0m[2m:[0m Sending request to LLM endpoint: http://bitfrost.botnet:8080/v1 with model: llamacpp/qwen3.6-27b
+[2m2026-05-11T19:16:27.277894Z[0m [32m INFO[0m [2mcodegraph::ingest::analyzer[0m[2m:[0m Analyzing file src/llm/mod.rs (42 tokens)
+[2m2026-05-11T19:16:27.277933Z[0m [32m INFO[0m [2mcodegraph::llm::client[0m[2m:[0m Sending request to LLM endpoint: http://bitfrost.botnet:8080/v1 with model: llamacpp/qwen3.6-27b
+[2m2026-05-11T19:18:15.022548Z[0m [32m INFO[0m [2mcodegraph::ingest::analyzer[0m[2m:[0m Analyzing file src/llm/cache.rs (697 tokens)
+[2m2026-05-11T19:18:15.022582Z[0m [32m INFO[0m [2mcodegraph::llm::client[0m[2m:[0m Sending request to LLM endpoint: http://bitfrost.botnet:8080/v1 with model: llamacpp/qwen3.6-27b
+[2m2026-05-11T19:20:59.778348Z[0m [32m INFO[0m [2mcodegraph::ingest::analyzer[0m[2m:[0m Analyzing file src/llm/prompt.rs (1325 tokens)
+[2m2026-05-11T19:20:59.778378Z[0m [32m INFO[0m [2mcodegraph::llm::client[0m[2m:[0m Sending request to LLM endpoint: http://bitfrost.botnet:8080/v1 with model: llamacpp/qwen3.6-27b
+[2m2026-05-11T19:22:45.224796Z[0m [32m INFO[0m [2mcodegraph::ingest::analyzer[0m[2m:[0m Analyzing file src/config/writer.rs (1091 tokens)
+[2m2026-05-11T19:22:45.224831Z[0m [32m INFO[0m [2mcodegraph::llm::client[0m[2m:[0m Sending request to LLM endpoint: http://bitfrost.botnet:8080/v1 with model: llamacpp/qwen3.6-27b
+[2m2026-05-11T19:26:04.734120Z[0m [32m INFO[0m [2mcodegraph::ingest::analyzer[0m[2m:[0m Analyzing file src/config/schema.rs (496 tokens)
+[2m2026-05-11T19:26:04.734160Z[0m [32m INFO[0m [2mcodegraph::llm::client[0m[2m:[0m Sending request to LLM endpoint: http://bitfrost.botnet:8080/v1 with model: llamacpp/qwen3.6-27b
+[2m2026-05-11T19:27:56.297696Z[0m [32m INFO[0m [2mcodegraph::ingest::analyzer[0m[2m:[0m Analyzing file src/config/mod.rs (22 tokens)
+[2m2026-05-11T19:27:56.297785Z[0m [32m INFO[0m [2mcodegraph::llm::client[0m[2m:[0m Sending request to LLM endpoint: http://bitfrost.botnet:8080/v1 with model: llamacpp/qwen3.6-27b
+[2m2026-05-11T19:28:49.908784Z[0m [32m INFO[0m [2mcodegraph::ingest::local[0m[2m:[0m Ingested 40 files, skipped 0 unchanged, 0 errors from .
