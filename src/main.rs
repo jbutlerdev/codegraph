@@ -65,8 +65,11 @@ async fn main() -> Result<()> {
         cli::Commands::Stats => {
             cli::show_stats().await?;
         }
-        cli::Commands::Defines { entity_type, name, repo } => {
-            cli::find_definition(entity_type.as_str(), &name, repo.as_deref()).await?;
+        cli::Commands::Top { entity_type, repo, limit } => {
+            cli::find_top_entities(entity_type.as_str(), repo.as_deref(), limit).await?;
+        }
+        cli::Commands::Defines { entity_type, name, repo, all } => {
+            cli::find_definition(entity_type.as_str(), &name, repo.as_deref(), all).await?;
         }
         cli::Commands::Uses { entity_type, name, repo } => {
             cli::find_usages(entity_type.as_str(), &name, repo.as_deref()).await?;

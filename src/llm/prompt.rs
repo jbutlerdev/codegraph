@@ -1,7 +1,7 @@
 //! LLM prompt templates
 
 /// File analysis prompt
-pub static FILE_ANYSIS_PROMPT: &str = r#"You are analyzing a single source file for a code knowledge graph.
+pub static FILE_ANALYSIS_PROMPT: &str = r#"You are analyzing a single source file for a code knowledge graph.
 Return ONLY a JSON object, no prose, no markdown fences, with EXACTLY these keys:
 
 - purpose          : string  — Authoritative explanation of why this file exists and how it fits in the system. No speculation, no roadmap, no invented intent. Return empty string only if purpose cannot be inferred. Max ~300 tokens.
@@ -13,6 +13,15 @@ Return ONLY a JSON object, no prose, no markdown fences, with EXACTLY these keys
 - importsInternal  : string[] — Relative imports only (./ or ../). Exact paths as written.
 - importsExternal  : string[] — External packages or standard libraries only. Package names only (no paths).
 - keywords         : string[] — Up to 10 technical domain keywords or short phrases for AI-powered search. Focus on: technologies, frameworks, domain concepts, algorithms, patterns, protocols. Use natural casing. No generic terms like "code", "file", "function".
+
+IMPORTANT: For Python files, extract imported classes correctly:
+- `from module import ClassName` → include "ClassName" in importsExternal
+- `from .relative import Something` → include "Something" in importsInternal
+- `import module` → include "module" in importsExternal
+
+For JavaScript/TypeScript:
+- `import { ClassName } from 'module'` → include "ClassName" in importsExternal if from external package
+- `import { ClassName } from './file'` → include "ClassName" in importsInternal if from relative path
 
 File path: {path}
 File content:
@@ -59,7 +68,7 @@ INPUT ({count} partial analyses):
 
 /// Build a file analysis prompt
 pub fn build_analysis_prompt(path: &str, content: &str) -> String {
-    FILE_ANYSIS_PROMPT
+    FILE_ANALYSIS_PROMPT
         .replace("{path}", path)
         .replace("{content}", content)
 }

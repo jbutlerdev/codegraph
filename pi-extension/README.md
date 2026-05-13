@@ -6,55 +6,71 @@ A [pi](https://github.com/mariozechner/pi-coding-agent) extension that exposes C
 
 The extension is auto-discovered when placed in `~/.pi/agent/extensions/`.
 
-To use this extension from the CodeGraph repo:
-
 ```bash
 ln -sf /data/jbutler/git/jbutlerdev/codegraph/pi-extension ~/.pi/agent/extensions/codegraph
 ```
 
-## Available Tools (for agents)
+## Available Tools (5 total)
 
-| Tool | Description |
-|------|-------------|
-| `codegraph_search` | Full-text search (LLM summaries) |
-| `codegraph_lookup` | Entity lookup (keywords, classes, functions) |
-| `codegraph_grep` | Text search in files |
-| `codegraph_cat` | View file metadata + content |
+| Tool | Purpose |
+|------|---------|
+| `codegraph_list_repos` | List indexed repos, get repo_id |
+| `codegraph_search` | Semantic search across code |
+| `codegraph_entity` | Find where code is defined/used |
+| `codegraph_file` | File deps, dependents, or content |
+| `codegraph_grep` | Text pattern search |
 
-## Available Commands (for users)
+## Usage Examples
 
-| Command | Description |
-|---------|-------------|
-| `/codegraph-stats` | Show indexing statistics |
-| `/codegraph-ls` | List indexed repositories |
-| `/codegraph-ingest` | Index a directory |
-| `/codegraph-delete` | Remove a repository |
+```typescript
+// Start: get repo ID
+codegraph_list_repos()
 
-## Usage
+// Search for relevant files
+codegraph_search({query: "database pool", repo_id: "..."})
 
-After loading, the agent can use these tools for code knowledge queries:
+// Find where a class is defined
+codegraph_entity({
+  operation: "defines",
+  entity_type: "class",
+  name: "ConnectionPool",
+  repo_id: "..."
+})
 
+// Get both definition and usages
+codegraph_entity({
+  operation: "all",
+  entity_type: "class",
+  name: "ConnectionPool",
+  repo_id: "..."
+})
+
+// Check what a file depends on
+codegraph_file({
+  operation: "deps",
+  repo_id: "...",
+  file: "src/base_fetcher.py"
+})
+
+// View file content
+codegraph_file({
+  operation: "cat",
+  repo_id: "...",
+  file: "src/main.rs",
+  show_content: true
+})
 ```
-User: Find files related to database operations
-Agent: codegraph_search({ query: "database persistence sqlite" })
-       codegraph_lookup({ term: "Database" })
-```
+
+## Tips
+
+- **Short repo IDs work**: `6fb99013` instead of full UUID
+- **Search without line numbers**: `ConnectionPool` finds `ConnectionPool (~L40-58)`
+- **Use operation=all**: Shows both definition and usages together
 
 ## Configuration
 
-The extension looks for the CodeGraph binary at:
 ```
 /data/jbutler/git/jbutlerdev/codegraph/target/release/codegraph
 ```
 
-## Development
-
-To test changes:
-```bash
-pi --reload
-```
-
-Or run with the extension directly:
-```bash
-pi -e ./pi-extension/src/index.ts
-```
+Set `CODEGRAPH_BIN` env var to change this path.

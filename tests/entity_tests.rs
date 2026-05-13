@@ -1,6 +1,6 @@
 //! Entity tests
 
-use codegraph::db::{Database, Knowledge, FileInput, KnowledgeState};
+use codegraph::db::{Database, Knowledge, FileInput, KnowledgeState, LinkType};
 use tempfile::tempdir;
 
 #[test]
@@ -33,7 +33,7 @@ fn test_keyword_crud() {
     let kid2 = db.get_or_create_keyword("Auth").unwrap(); // Should match case-insensitive
     
     // Link to file
-    db.link_file_keywords(file_id, &[kid1]).unwrap();
+    db.link_file_keywords(file_id, &[kid1], LinkType::Defines).unwrap();
     
     // Get file keywords
     let keywords = db.get_file_keywords(file_id).unwrap();
@@ -72,7 +72,7 @@ fn test_class_crud() {
     
     // Create class
     let cid = db.get_or_create_class("AuthService (~L12-58): handles login").unwrap();
-    db.link_file_classes(file_id, &[cid]).unwrap();
+    db.link_file_classes(file_id, &[cid], LinkType::Defines).unwrap();
     
     // Get file classes
     let classes = db.get_file_classes(file_id).unwrap();
@@ -107,7 +107,7 @@ fn test_function_crud() {
     
     // Create function
     let fid = db.get_or_create_function("handle_login (~L60-100): authenticates user").unwrap();
-    db.link_file_functions(file_id, &[fid]).unwrap();
+    db.link_file_functions(file_id, &[fid], LinkType::Defines).unwrap();
     
     // Get file functions
     let functions = db.get_file_functions(file_id).unwrap();
@@ -142,11 +142,11 @@ fn test_module_crud() {
     
     // Create internal module
     let mid1 = db.get_or_create_module("./auth", false).unwrap();
-    db.link_file_imports_internal(file_id, &[mid1]).unwrap();
+    db.link_file_imports_internal(file_id, &[mid1], LinkType::Defines).unwrap();
     
     // Create external module
     let mid2 = db.get_or_create_module("bcrypt", true).unwrap();
-    db.link_file_imports_external(file_id, &[mid2]).unwrap();
+    db.link_file_imports_external(file_id, &[mid2], LinkType::References).unwrap();
     
     // Get file imports
     let (internal, external) = db.get_file_imports(file_id).unwrap();
@@ -183,7 +183,7 @@ fn test_clear_file_links() {
     
     // Add links
     let kid = db.get_or_create_keyword("test").unwrap();
-    db.link_file_keywords(file_id, &[kid]).unwrap();
+    db.link_file_keywords(file_id, &[kid], LinkType::Defines).unwrap();
     
     // Verify link exists
     let keywords = db.get_file_keywords(file_id).unwrap();

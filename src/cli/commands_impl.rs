@@ -655,16 +655,57 @@ pub async fn delete_repo(id: &str) -> AnyResult<()> {
 /// Show usage statistics
 pub async fn show_stats() -> AnyResult<()> {
     let db = Database::open()?;
-    let repos = db.list_knowledge()?;
+    
+    let stats = db.get_repo_stats(None)?;
 
-    let total_files: i32 = repos.iter().map(|r| r.file_count).sum();
-    let processed = repos.iter().filter(|r| r.state == crate::db::KnowledgeState::Processed).count();
+    println!("\n{} \n", "STATISTICS".bold());
 
-    println!("\n{} {}\n", "STATISTICS".bold(), "\n");
+    println!("  {:20} {}", "Total Repositories".dimmed(), stats.repos.len());
+    println!("  {:20} {}", "Total Files".dimmed(), stats.total_files);
+    println!("  {:20} {}", "Total Classes".dimmed(), stats.total_classes);
+    println!("  {:20} {}", "Total Functions".dimmed(), stats.total_functions);
+    println!("  {:20} {}", "Total Modules".dimmed(), stats.total_modules);
+    println!("  {:20} {}", "Total Keywords".dimmed(), stats.total_keywords);
 
-    println!("  {:20} {}", "Total Repositories".dimmed(), repos.len());
-    println!("  {:20} {}", "Processed".dimmed(), processed);
-    println!("  {:20} {}", "Total Files".dimmed(), total_files);
+    // Show per-repo breakdown
+    if !stats.repos.is_empty() {
+        println!("\n{} \n", "REPOSITORY BREAKDOWN".bold());
+        for repo in &stats.repos {
+            let short_id = if repo.knowledge_id.len() > 8 {
+                &repo.knowledge_id[..8]
+            } else {
+                &repo.knowledge_id
+            };
+            println!("  {} {}", short_id.dimmed(), repo.repo_name.bold());
+            println!("    {:20} {} files, {} classes, {} functions",
+                "".dimmed(),
+                repo.file_count,
+                repo.class_count,
+                repo.function_count
+            );
+        }
+    }
+
+    // Show top entities per type
+    println!("\n{} \n", "TOP ENTITIES BY USAGE".bold());
+    
+    for entity_type in ["class", "function", "module"] {
+        let top = db.get_top_entities_by_usage(entity_type, None, 5)?;
+        if !top.is_empty() {
+            let label = match entity_type {
+                "class" => "classes",
+                "function" => "functions", 
+                "module" => "modules",
+                _ => entity_type,
+            };
+            println!("  {} {}:", entity_type.to_uppercase().cyan(), label);
+            for (i, stat) in top.iter().enumerate() {
+                let clean_name = stat.name.split('(').next().unwrap_or(&stat.name).trim();
+                println!("    {}. {} ({} refs)", i + 1, clean_name.bold(), stat.usage_count);
+            }
+            println!();
+        }
+    }
 
     println!();
     Ok(())

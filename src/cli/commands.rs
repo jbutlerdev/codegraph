@@ -143,6 +143,21 @@ pub enum Commands {
     /// Show usage statistics
     Stats,
 
+    /// Find most depended-upon entities
+    Top {
+        /// Entity type (class, function, module)
+        #[arg(value_enum, default_value = "class")]
+        entity_type: EntityType,
+
+        /// Repository ID (optional, searches all)
+        #[arg(short, long)]
+        repo: Option<String>,
+
+        /// Maximum results (default: 10)
+        #[arg(short, long, default_value_t = 10)]
+        limit: usize,
+    },
+
     /// Find where an entity is defined
     Defines {
         /// Entity type (class, function, module)
@@ -155,6 +170,10 @@ pub enum Commands {
         /// Repository ID (optional, searches all)
         #[arg(short, long)]
         repo: Option<String>,
+
+        /// Show both definition and all usages in one view
+        #[arg(short, long)]
+        all: bool,
     },
 
     /// Find files that reference/use an entity

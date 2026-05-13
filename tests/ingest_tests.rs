@@ -1,6 +1,6 @@
 //! Integration tests for the full indexing pipeline
 
-use codegraph::db::{Database, Knowledge, FileInput};
+use codegraph::db::{Database, Knowledge, FileInput, LinkType};
 use std::fs;
 use tempfile::tempdir;
 
@@ -74,11 +74,11 @@ fn test_file_analysis_workflow() {
     let module_ext = db.get_or_create_module("bcrypt", true).unwrap();
     
     // Link entities to file
-    db.link_file_keywords(file_id, &[kw1, kw2, kw3]).unwrap();
-    db.link_file_classes(file_id, &[class_id]).unwrap();
-    db.link_file_functions(file_id, &[fn_id, fn_id2]).unwrap();
-    db.link_file_imports_internal(file_id, &[module_int]).unwrap();
-    db.link_file_imports_external(file_id, &[module_ext]).unwrap();
+    db.link_file_keywords(file_id, &[kw1, kw2, kw3], LinkType::Defines).unwrap();
+    db.link_file_classes(file_id, &[class_id], LinkType::Defines).unwrap();
+    db.link_file_functions(file_id, &[fn_id, fn_id2], LinkType::Defines).unwrap();
+    db.link_file_imports_internal(file_id, &[module_int], LinkType::References).unwrap();
+    db.link_file_imports_external(file_id, &[module_ext], LinkType::References).unwrap();
     
     // Verify all links
     let keywords = db.get_file_keywords(file_id).unwrap();
@@ -127,7 +127,7 @@ fn test_multi_channel_search() {
         };
         let file_id = db.upsert_file(&file_input).unwrap();
         let kw_id = db.get_or_create_keyword(keyword).unwrap();
-        db.link_file_keywords(file_id, &[kw_id]).unwrap();
+        db.link_file_keywords(file_id, &[kw_id], LinkType::Defines).unwrap();
     }
     
     // Search for "auth" should find auth/login.rs
@@ -187,7 +187,7 @@ fn test_entity_deduplication() {
         
         // All files use "authentication" keyword
         let kw_id = db.get_or_create_keyword("authentication").unwrap();
-        db.link_file_keywords(file_id, &[kw_id]).unwrap();
+        db.link_file_keywords(file_id, &[kw_id], LinkType::Defines).unwrap();
     }
     
     // Search for authentication - should find all 3 files
@@ -335,7 +335,7 @@ fn test_delete_cascades() {
     
     // Link entities
     let kw_id = db.get_or_create_keyword("test").unwrap();
-    db.link_file_keywords(file_id, &[kw_id]).unwrap();
+    db.link_file_keywords(file_id, &[kw_id], LinkType::Defines).unwrap();
     
     // Verify file exists
     assert!(db.get_file("delete-test", "test.rs").unwrap().is_some());

@@ -1,17 +1,10 @@
 # CodeGraph Extension for pi
 
-This extension provides tools for querying a local code knowledge graph powered by CodeGraph.
+This extension provides 5 tools for querying a local code knowledge graph powered by CodeGraph.
 
-## Overview
+## Tools (5 total)
 
-CodeGraph indexes code repositories locally using:
-- **SQLite + FTS5** for full-text search
-- **LLM analysis** for purpose, summary, and entity extraction
-- **SHA256 diff** to only re-index changed files
-
-## Tools
-
-### codegraph_list_repos
+### 1. codegraph_list_repos
 **Start here!** List all indexed repositories with their IDs.
 
 ```typescript
@@ -19,14 +12,7 @@ await codegraph_list_repos()
 // Returns: UUIDs for all indexed repos
 ```
 
-### codegraph_help
-Quick reference guide for all CodeGraph tools.
-
-```typescript
-await codegraph_help()
-```
-
-### codegraph_search
+### 2. codegraph_search
 Full-text semantic search across LLM-generated summaries.
 
 ```typescript
@@ -37,69 +23,97 @@ await codegraph_search({
 })
 ```
 
-### codegraph_lookup
-Find code entities (keywords, classes, functions) by name.
+### 3. codegraph_entity
+Entity relationships - find where code is defined and what uses it.
+
+| Operation | Description |
+|-----------|-------------|
+| `defines` | Find where entity is defined |
+| `uses` | Find files that reference entity |
+| `all` | Both definition AND usages |
 
 ```typescript
-await codegraph_lookup({
-  term: "Database",
-  repo_id: "40a30ade-...",
+// Where is ConnectionPool defined?
+await codegraph_entity({
+  operation: "defines",
+  entity_type: "class",
+  name: "ConnectionPool",
+  repo_id: "...",
+})
+
+// Definition + all usages together
+await codegraph_entity({
+  operation: "all",
+  entity_type: "class",
+  name: "ConnectionPool",
+  repo_id: "...",
+})
+
+// What files use BaseFetcher?
+await codegraph_entity({
+  operation: "uses",
+  entity_type: "class",
+  name: "BaseFetcher",
+  repo_id: "...",
 })
 ```
 
-### codegraph_grep
-Search for text patterns within files.
+### 4. codegraph_file
+File relationships and content viewing.
+
+| Operation | Description |
+|-----------|-------------|
+| `deps` | What does file define and import |
+| `dependents` | What files depend on this file |
+| `cat` | View file metadata and content |
 
 ```typescript
-await codegraph_grep({
-  pattern: "update_knowledge",
-  repo_id: "40a30ade-...",
-  glob: "*.rs",
+// What does base_fetcher.py depend on?
+await codegraph_file({
+  operation: "deps",
+  repo_id: "...",
+  file: "src/base_fetcher.py",
 })
-```
 
-### codegraph_cat
-View file metadata, LLM analysis, and content.
+// What depends on base_fetcher.py?
+await codegraph_file({
+  operation: "dependents",
+  repo_id: "...",
+  file: "src/base_fetcher.py",
+})
 
-```typescript
-await codegraph_cat({
-  repo_id: "40a30ade-...",
+// View file content
+await codegraph_file({
+  operation: "cat",
+  repo_id: "...",
   file: "src/main.rs",
   show_content: true,
   range: "1-50",
 })
 ```
 
+### 5. codegraph_grep
+Text pattern search within files.
+
+```typescript
+await codegraph_grep({
+  pattern: "update_knowledge",
+  repo_id: "...",
+  glob: "*.rs",
+})
+```
+
 ## Recommended Workflow
 
 ```
-1. codegraph_list_repos()  → Get repo_id (UUID)
+1. codegraph_list_repos()  → Get repo_id
 2. codegraph_search()      → Find relevant files by concept
-3. codegraph_lookup()      → Find specific symbols
-4. codegraph_cat()         → View file details + content
+3. codegraph_entity()      → Find where code is defined/used
+4. codegraph_file()        → Check file deps or view content
 ```
 
 ## Tips
 
-- **Always pass `repo_id`** - Without it, searches may return results from wrong repos
-- **Use natural language for search** - "database pool" not "SQLite struct"
-- **Avoid meta queries** - "pi-server" won't work, try "REST API" or "web server"
-- **Get repo IDs first** - Call `list_repos` at the start of any new codebase exploration
-
-## Commands (for users)
-
-| Command | Description |
-|---------|-------------|
-| `/codegraph-stats` | Show indexing statistics |
-| `/codegraph-ls` | List indexed repositories |
-| `/codegraph-ingest` | Index a directory |
-| `/codegraph-delete` | Remove a repository |
-
-## Configuration
-
-The extension expects CodeGraph at:
-```
-/data/jbutler/git/jbutlerdev/codegraph/target/release/codegraph
-```
-
-Set `CODEGRAPH_BIN` environment variable or modify the extension to change this path.
+- **Short repo IDs work**: Use `6fb99013` instead of full UUID
+- **Search without line numbers**: `ConnectionPool` finds `ConnectionPool (~L40-58)`
+- **Use operation=all**: Shows both definition and usages in one call

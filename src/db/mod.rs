@@ -9,4 +9,5 @@ mod search;
 pub use conn::*;
 pub use knowledge::*;
 pub use files::*;
+pub use entities::*;
 pub use search::*;

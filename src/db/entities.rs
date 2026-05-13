@@ -52,6 +52,38 @@ pub struct FileDependencies {
     pub modules_imported: Vec<String>,
 }
 
+/// Entity usage statistics (for finding most depended-upon entities)
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct EntityUsageStats {
+    pub id: i64,
+    pub entity_type: String,
+    pub name: String,
+    pub usage_count: i32,
+}
+
+/// Repository statistics
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct RepoStats {
+    pub repos: Vec<RepoStat>,
+    pub total_files: i32,
+    pub total_classes: i32,
+    pub total_functions: i32,
+    pub total_modules: i32,
+    pub total_keywords: i32,
+}
+
+/// Per-repository statistics
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct RepoStat {
+    pub knowledge_id: String,
+    pub repo_name: String,
+    pub file_count: i32,
+    pub class_count: i32,
+    pub function_count: i32,
+    pub module_count: i32,
+    pub keyword_count: i32,
+}
+
 impl Database {
     /// Get or create a keyword
     pub fn get_or_create_keyword(&self, name: &str) -> Result<i64> {
@@ -429,31 +461,46 @@ impl Database {
             None => String::new(),
         };
 
+        // Fix #1: Entity name matching - use prefix match with LIKE for flexible name matching
+        // Fix #2: Short repo ID matching - use LIKE prefix for partial UUID matches
         let knowledge_filter = match knowledge_id {
-            Some(kid) => format!("AND f.knowledge_id = '{}'", kid),
+            Some(kid) => format!("AND f.knowledge_id LIKE '{}%'", kid),
             None => String::new(),
         };
 
-        // For classes/functions, match if the name appears at start (before the colon or parens)
-        // For modules, exact match
+        // For classes/functions, extract just the name before the signature format
+        // Signatures are stored as: "EntityName (~L10-20): description" or "EntityName: description"
+        // We extract the name part for matching
         let (sql_extra, lookup_value) = match entity_type {
             "class" | "function" => {
-                // Match signatures where the name part (before : or ( ) starts with the search term
-                let like_pattern = format!("{}%", entity_name.to_lowercase());
+                // Use SQLite string functions to extract name before '(' or ':'
+                // The signature is typically: "Name (~L10-20): description"
+                // We want to extract just "Name" and match it against the search term
+                let name_lower = entity_name.to_lowercase();
+                let like_pattern = format!("{}%", name_lower);
+                
+                // Use SUBSTR to extract name before '(' or ':'
+                // This allows matching "ConnectionPool" against "ConnectionPool (~L40-58): desc"
                 (
                     format!(
-                        r#"AND LOWER(t.{}) LIKE ?1"#,
-                        if entity_type == "module" { "name" } else { "signature" }
+                        r#"AND LOWER(SUBSTR(t.signature, 1, 
+                            CASE 
+                                WHEN INSTR(t.signature, ' (') > 0 THEN INSTR(t.signature, ' (') - 1
+                                WHEN INSTR(t.signature, '(') > 0 THEN INSTR(t.signature, '(') - 1
+                                WHEN INSTR(t.signature, ':') > 0 THEN INSTR(t.signature, ':') - 1
+                                ELSE LENGTH(t.signature)
+                            END)) LIKE ?1"#
                     ),
                     like_pattern,
                 )
             }
             "module" => {
+                // For modules, do prefix match on the name
                 (
                     format!(
-                        r#"AND LOWER(t.name) = LOWER(?1)"#
+                        r#"AND LOWER(t.name) LIKE ?1"#
                     ),
-                    entity_name.to_string(),
+                    format!("{}%", entity_name.to_lowercase()),
                 )
             }
             _ => (String::new(), entity_name.to_string()),
@@ -514,8 +561,9 @@ impl Database {
     pub fn get_similar_files(&self, file_id: i64, knowledge_id: Option<&str>, limit: i32) -> Result<Vec<(String, String, i32)>> {
         let conn = self.conn.lock();
 
+        // Fix #2: Short repo ID matching - use LIKE prefix
         let knowledge_filter = match knowledge_id {
-            Some(kid) => format!("AND f2.knowledge_id = '{}'", kid),
+            Some(kid) => format!("AND f2.knowledge_id LIKE '{}%'", kid),
             None => String::new(),
         };
 
@@ -591,6 +639,136 @@ impl Database {
         })
     }
 
+    /// Get top entities by usage count (most depended-upon entities)
+    pub fn get_top_entities_by_usage(&self, entity_type: &str, knowledge_id: Option<&str>, limit: i32) -> Result<Vec<EntityUsageStats>> {
+        let conn = self.conn.lock();
+
+        let (link_table, id_col, table, name_col) = match entity_type {
+            "class" => ("file_classes", "class_id", "classes", "signature"),
+            "function" => ("file_functions", "function_id", "functions", "signature"),
+            "module" => ("file_imports_internal", "module_id", "modules", "name"),
+            _ => return Err(Error::InvalidInput("entity_type must be 'class', 'function', or 'module'".to_string())),
+        };
+
+        // Fix for short repo ID matching - use LIKE prefix
+        let knowledge_filter = match knowledge_id {
+            Some(kid) => format!("AND f.knowledge_id LIKE '{}%'", kid),
+            None => String::new(),
+        };
+
+        let sql = format!(
+            r#"SELECT t.id, t.{}, COUNT(DISTINCT f.id) as usage_count
+               FROM {} t
+               JOIN {} e ON t.id = e.{}
+               JOIN files f ON e.file_id = f.id
+               WHERE e.link_type = 'references'
+               {}
+               GROUP BY t.id, t.{}
+               ORDER BY usage_count DESC
+               LIMIT ?1"#,
+            name_col, table, link_table, id_col, knowledge_filter, name_col
+        );
+
+        let mut stmt = conn.prepare(&sql).map_err(Error::Database)?;
+        let rows = stmt.query_map(params![limit], |row| {
+            let id: i64 = row.get(0)?;
+            let name: String = row.get(1)?;
+            let usage_count: i32 = row.get(2)?;
+            
+            Ok(EntityUsageStats {
+                id,
+                entity_type: entity_type.to_string(),
+                name,
+                usage_count,
+            })
+        }).map_err(Error::Database)?;
+        
+        let mut results = Vec::new();
+        for row in rows {
+            results.push(row.map_err(Error::Database)?);
+        }
+        Ok(results)
+    }
+
+    /// Get repository statistics
+    pub fn get_repo_stats(&self, knowledge_id: Option<&str>) -> Result<RepoStats> {
+        let conn = self.conn.lock();
+
+        // Fix for short repo ID matching - use LIKE prefix
+        let knowledge_filter = match knowledge_id {
+            Some(kid) => format!("WHERE k.id LIKE '{}%'", kid),
+            None => String::new(),
+        };
+
+        // Get repo info
+        let repos: Vec<(String, String, i32)> = {
+            let mut stmt = conn.prepare(&format!(
+                r#"SELECT k.id, k.repo_name, k.file_count FROM knowledge k {}"#,
+                knowledge_filter
+            )).map_err(Error::Database)?;
+
+            let rows = stmt.query_map([], |row| {
+                Ok((row.get(0)?, row.get(1)?, row.get(2)?))
+            }).map_err(Error::Database)?;
+            rows.filter_map(|r| r.ok()).collect()
+        };
+
+        // Get entity counts per repo
+        let mut repo_stats = Vec::new();
+        for (kid, name, file_count) in repos {
+            let kid_filter = format!("WHERE f.knowledge_id = '{}'", kid);
+            
+            let class_count: i32 = conn.query_row(
+                &format!("SELECT COUNT(DISTINCT class_id) FROM file_classes fc JOIN files f ON fc.file_id = f.id {}", kid_filter),
+                [],
+                |row| row.get(0),
+            ).unwrap_or(0);
+
+            let function_count: i32 = conn.query_row(
+                &format!("SELECT COUNT(DISTINCT function_id) FROM file_functions ff JOIN files f ON ff.file_id = f.id {}", kid_filter),
+                [],
+                |row| row.get(0),
+            ).unwrap_or(0);
+
+            let module_count: i32 = conn.query_row(
+                &format!("SELECT COUNT(DISTINCT module_id) FROM file_imports_internal fi JOIN files f ON fi.file_id = f.id {}", kid_filter),
+                [],
+                |row| row.get(0),
+            ).unwrap_or(0);
+
+            let keyword_count: i32 = conn.query_row(
+                &format!("SELECT COUNT(DISTINCT keyword_id) FROM file_keywords fk JOIN files f ON fk.file_id = f.id {}", kid_filter),
+                [],
+                |row| row.get(0),
+            ).unwrap_or(0);
+
+            repo_stats.push(RepoStat {
+                knowledge_id: kid,
+                repo_name: name,
+                file_count,
+                class_count,
+                function_count,
+                module_count,
+                keyword_count,
+            });
+        }
+
+        let total_files: i32 = repo_stats.iter().map(|r| r.file_count).sum();
+        let total_classes: i32 = repo_stats.iter().map(|r| r.class_count).sum();
+        let total_functions: i32 = repo_stats.iter().map(|r| r.function_count).sum();
+        let total_modules: i32 = repo_stats.iter().map(|r| r.module_count).sum();
+        let total_keywords: i32 = repo_stats.iter().map(|r| r.keyword_count).sum();
+
+        Ok(RepoStats {
+            repos: repo_stats,
+            total_files,
+            total_classes,
+            total_functions,
+            total_modules,
+            total_keywords,
+        })
+    }
+
     /// Get reverse dependencies (files that depend on this file)
     pub fn get_file_dependents(&self, file_id: i64, knowledge_id: Option<&str>, limit: i32) -> Result<Vec<(String, String)>> {
         let conn = self.conn.lock();
@@ -614,8 +792,9 @@ impl Database {
             return Ok(Vec::new());
         }
 
+        // Fix #2: Short repo ID matching - use LIKE prefix
         let knowledge_filter = match knowledge_id {
-            Some(kid) => format!("AND f.knowledge_id = '{}'", kid),
+            Some(kid) => format!("AND f.knowledge_id LIKE '{}%'", kid),
             None => String::new(),
         };
 
