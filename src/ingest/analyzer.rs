@@ -68,7 +68,7 @@ pub async fn analyze_file(
 
     // If threshold is 0, chunking is disabled
     if threshold > 0 && tokens > threshold {
-        info!("File {} is large ({} tokens, threshold: {}), using chunked analysis", 
+        info!("File {} exceeds token limit ({} > {}), chunking not yet implemented - file will be skipped", 
               relative_path, tokens, threshold);
         return analyze_big_file(llm_client, relative_path, content).await;
     }
@@ -96,22 +96,19 @@ pub async fn analyze_file(
 }
 
 /// Analyze a large file by chunking
+/// 
+/// NOTE: This is not yet implemented. Large files are skipped with a warning.
+/// Set `max_file_tokens` to 0 to disable the threshold entirely, or implement
+/// chunking by splitting content into chunks and calling analyze_chunk() for each.
 async fn analyze_big_file(
     _llm_client: &LlmClient,
     _relative_path: &str,
     _content: &str,
 ) -> Result<AnalysisResult> {
-    // TODO: Implement chunking and recursive condensation
-    // For now, just return empty analysis
-    Ok(AnalysisResult {
-        language: "unknown".to_string(),
-        analysis: FileAnalysis::default(),
-        usage: LlmUsage {
-            model: String::new(),
-            input_tokens: 0,
-            output_tokens: 0,
-        },
-    })
+    // Chunking not yet implemented - caller should skip large files
+    // This stub exists to match the call site but should never actually be reached
+    // since analyze_file() logs a warning and skips before calling this.
+    Err(anyhow::anyhow!("Chunking not implemented - large files should be skipped by caller"))
 }
 
 /// Parse the LLM response into an analysis
