@@ -39,6 +39,9 @@ pub enum Commands {
         /// Path to local directory
         #[arg(value_hint = ValueHint::DirPath)]
         path: PathBuf,
+        /// Force re-analysis of all files (bypass SHA check)
+        #[arg(short, long)]
+        force: bool,
     },
 
     /// List indexed repositories

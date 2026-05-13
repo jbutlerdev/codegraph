@@ -38,8 +38,8 @@ async fn main() -> Result<()> {
         cli::Commands::Index { url, branch, token } => {
             ingest::github::index_repo(&url, branch.as_deref(), token.as_deref()).await?;
         }
-        cli::Commands::Ingest { path } => {
-            ingest::local::ingest_path(&path).await?;
+        cli::Commands::Ingest { path, force } => {
+            ingest::local::ingest_path(&path, force).await?;
         }
         cli::Commands::Ls => {
             cli::list_repos().await?;

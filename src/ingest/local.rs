@@ -17,7 +17,9 @@ use uuid::Uuid;
 type FileProcessResult = Result<(String, String), (String, String)>;
 
 /// Ingest a local directory
-pub async fn ingest_path(path: &Path) -> Result<()> {
+/// 
+/// If `force` is true, re-analyzes all files regardless of SHA256 (ignores unchanged check)
+pub async fn ingest_path(path: &Path, force: bool) -> Result<()> {
     let config = load_config()?;
     config.validate().map_err(|e| anyhow::anyhow!(e))?;
 
@@ -35,7 +37,11 @@ pub async fn ingest_path(path: &Path) -> Result<()> {
     let existing_knowledge = db.get_knowledge_by_path(&lookup_path)?;
     
     let knowledge_id = if let Some(existing) = existing_knowledge {
-        info!("Found existing repo {} for path {}", existing.id, path_str);
+        if force {
+            info!("Force re-indexing repo {} at {}", existing.id, path_str);
+        } else {
+            info!("Found existing repo {} for path {}", existing.id, path_str);
+        }
         existing.id
     } else {
         let new_id = Uuid::new_v4().to_string();
@@ -65,8 +71,14 @@ pub async fn ingest_path(path: &Path) -> Result<()> {
     let files = scan_directory(path).await?;
     
     // Get existing SHA256 map for diff-aware re-indexing
-    let existing_shas = db.get_file_shas(&knowledge_id)?;
-    info!("Found {} existing file hashes in database", existing_shas.len());
+    let existing_shas = if force {
+        info!("Force mode: ignoring existing file hashes, will re-analyze all files");
+        std::collections::HashMap::new()
+    } else {
+        let shas = db.get_file_shas(&knowledge_id)?;
+        info!("Found {} existing file hashes in database", shas.len());
+        shas
+    };
     
     db.update_knowledge_progress(&knowledge_id, files.len() as i32, 0)?;
 
@@ -81,18 +93,24 @@ pub async fn ingest_path(path: &Path) -> Result<()> {
 
     // Analyze files concurrently with semaphore-gated concurrency
     let semaphore = Arc::new(Semaphore::new(config.concurrency));
-    info!("Starting ingestion with concurrency limit: {} (DB writes serialized)", config.concurrency);
+    info!("Starting ingestion with concurrency limit: {} (DB writes serialized){}", 
+          config.concurrency, if force { " [FORCE MODE]" } else { "" });
 
     // Separate files into unchanged vs needs processing
     let mut unchanged_count = 0;
     let to_process: Vec<_> = files.iter().filter(|file| {
-        let file_sha = compute_sha256(&file.content);
-        match existing_shas.get(&file.relative_path) {
-            Some(existing) if existing == &file_sha => {
-                unchanged_count += 1;
-                false
+        if force {
+            // Force mode: process all files
+            true
+        } else {
+            let file_sha = compute_sha256(&file.content);
+            match existing_shas.get(&file.relative_path) {
+                Some(existing) if existing == &file_sha => {
+                    unchanged_count += 1;
+                    false
+                }
+                _ => true
             }
-            _ => true
         }
     }).cloned().collect();
     let skipped = unchanged_count;
