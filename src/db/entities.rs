@@ -623,10 +623,10 @@ impl Database {
         let mut seen = std::collections::HashSet::new();
 
         for (entity_type, entity_id) in defined_entities {
-            let table = match entity_type.as_str() {
-                "class" => "file_classes",
-                "function" => "file_functions",
-                "module" => "file_imports_internal",
+            let (table, id_column) = match entity_type.as_str() {
+                "class" => ("file_classes", "class_id"),
+                "function" => ("file_functions", "function_id"),
+                "module" => ("file_imports_internal", "module_id"),
                 _ => continue,
             };
 
@@ -636,7 +636,7 @@ impl Database {
                    JOIN {} e ON f.id = e.file_id
                    WHERE e.{} = ?1 AND e.file_id != ?2 AND e.link_type = 'references'
                    {}"#,
-                table, entity_id, knowledge_filter
+                table, id_column, knowledge_filter
             );
 
             let mut stmt = conn.prepare(&sql).map_err(Error::Database)?;

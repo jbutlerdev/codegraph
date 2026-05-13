@@ -35,16 +35,16 @@ Return ONLY a JSON object, no prose, no markdown fences, with EXACTLY these keys
 - language         : string  — Lowercase canonical name of any programming, markup, config, or data language identifiable from the contents (e.g. typescript, python, go, dockerfile, markdown, terraform, graphql). Return "unknown" if you cannot identify the language with confidence.
 
 # Entities DEFINED in this file (the file creates/exports these):
-- classesDefined   : string[] — Structural/type definitions declared in THIS file (classes, interfaces, enums, structs, unions, traits, etc.). Format: "ExactName (~L3-29): What it represents". Exact names from source code.
-- functionsDefined : string[] — Functions/methods/procedures defined in THIS file. Format: "exact_name (~L3-29): Primary responsibility". Exact names from source code.
-- modulesDefined   : string[] — Module names this file defines (e.g. Go package name, Rust mod, Python __name__, etc.).
+- classes_defined   : string[] — Structural/type definitions declared in THIS file (classes, interfaces, enums, structs, unions, traits, etc.). Format: "ExactName (~L3-29): What it represents". Exact names from source code.
+- functions_defined : string[] — Functions/methods/procedures defined in THIS file. Format: "exact_name (~L3-29): Primary responsibility". Exact names from source code.
+- modules_defined   : string[] — Module names this file defines (e.g. Go package name, Rust mod, Python __name__, etc.).
 - keywords         : string[] — Up to 10 technical domain keywords for search. Focus on: technologies, frameworks, domain concepts, algorithms, patterns, protocols.
 
 # Entities USED/IMPORTED by this file (the file depends on these):
-- classesUsed      : string[] — Structural/type definitions from OTHER files that this file instantiates, extends, or uses. Format: "ClassName: Where it's imported from or context".
-- functionsUsed    : string[] — Functions from OTHER files that this file calls. Format: "function_name: Where it's imported from or context".
-- modulesImported  : string[] — Relative imports (./ or ../). Exact paths as written.
-- modulesExternal  : string[] — External packages/libraries imported. Package names only.
+- classes_used      : string[] — Structural/type definitions from OTHER files that this file instantiates, extends, or uses. Format: "ClassName: Where it's imported from or context".
+- functions_used    : string[] — Functions from OTHER files that this file calls. Format: "function_name: Where it's imported from or context".
+- modules_imported  : string[] — Relative imports (./ or ../). Exact paths as written.
+- modules_external  : string[] — External packages/libraries imported. Package names only.
 
 File path: {path}
 File content:
